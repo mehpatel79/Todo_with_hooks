@@ -1,0 +1,13 @@
+.strike{
+    text-decoration: line-through;
+    opacity: 0.5;
+    
+}
+
+.disbtn{
+    display: block;
+}
+
+.hidbtn{
+    display: none;
+}
