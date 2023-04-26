@@ -2,14 +2,12 @@ Take input text field for entering the task to do.
 
 Store this task in one array when click on add task button and this task list displayed on the page with checkbox.
 
-There is also provide reset button, if you wish to reset the task.
+There is a reset button, which handle the event to clear the task list. 
 
-After selecting the task, selected task goes into complete list with line-through mark and also checkbox.
+Each task list have a checkbox. While selecting a checkbox, the event handler execute a function to mark the task completed and then 
+this task should display in the completed list.
 
-If you unselect this checkbox then complete task should be removed from this list and task should be in the to do list.
+In the completed list, the completed task mark with line-through and it also has checkbox, when selecting this checkbox, this task goes into todo list with unchecked checkbox. 
 
 
-Provide update button to update the completed task
-
-Provide delete button to delete the completed task
 
