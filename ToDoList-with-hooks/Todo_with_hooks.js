@@ -1,117 +1,98 @@
-import React, { useState} from 'react';
-// import './App.css';
+import React, { useRef, useState} from 'react';
 import pm from './pm.css';
 
 const Todo_with_hooks = () => {
 
     const [inputValue, setInputValue] = useState("");
-    const [inputList, setInputList] = useState([]);
-    const [displayList1, setDisplayList1] = useState([]);
-    const [displayList2, setDisplayList2] = useState([]);
-    const [togglebtn, setTogglebtn] = useState(true);
-    const [updateId, setUpdateId] = useState(0);
+    const [counter, setCounter] = useState(0);
+    const [taskList, setTaskList] = useState([]);
+    const [isEdited, setIsEdited] = useState(true);
+    // const [useId, setUseId] = useState(0);
+    const idRef = useRef(0);
+
+    const inputRef = useRef(null);
 
     const handleChange = (e) => {
       setInputValue(e.target.value);
+      inputRef.current.focus();
     }
 
-    const handleChange2 = (e) => { }
 
+  
     const submitTask = () => {
-          let i = inputList.length + 1;
+          setCounter(counter + 1);
           let task = inputValue;
             if (task === "") {alert("Please Enter Task")}
             else {
-                  let addTask = {id:i, title:task, status:false};
-                  setInputList([...inputList, addTask]);
-                  setDisplayList1([...displayList1, addTask]);
+                  let addTask = {id:counter, title:task, status:false};
+                  setTaskList([...taskList, addTask]);
                   setInputValue("");
             }     
     }
 
     const resetTask = () => {
       setInputValue("");
-      setInputList([]);
-      setDisplayList1([]);
-      setDisplayList2([]);
-    }
+      setCounter(0);
+      setTaskList([]);
+      }
 
-    const chxCheck = (id) => {
-        let checkEntry = displayList1.filter(task => task.id !== id);
-   
-        let checkEntry2 = displayList1.map(task => {
+    const selectTask = (id) => {    
+        let taskArray = taskList.map(task => {
         if(task.id === id){ 
-          return ({id:task.id, title:task.title, status : true})
+          return ({id:task.id, title:task.title, status : !task.status})
         }
         return task
       });
-
-      checkEntry2 = checkEntry2.filter(task => task.id === id);
       
       setInputValue("");
-      setDisplayList1([...checkEntry]);
-      setDisplayList2([...displayList2, ...checkEntry2]);
+      setTaskList([...taskArray]);
+    
     }
   
-    const chxCheck2 = (id) => {
-        let checkEntry21 = displayList2.map(task => {
-          if(task.id === id){ 
-            return ({id:task.id, title:task.title, status : false})
-          }
-          return task
-        })
-
-        checkEntry21 = checkEntry21.filter(task => task.id === id);
-        let checkEntry22 = displayList2.filter(task => task.id !== id);
-     
-        setInputValue("");
-        setDisplayList1([...displayList1, ...checkEntry21]);
-        setDisplayList2([...checkEntry22]); 
-        setTogglebtn(true);
-          
-  }
-          
+        
     const cancelTask = () => {
-        setTogglebtn(true);
+        setIsEdited(true);
         setInputValue("");
     }
     
     const updateValue = (id,title) => {
-        setTogglebtn(false);
-        setUpdateId(id);
+        setIsEdited(false);
+        //setUseId(id);
+        idRef.current = id;
         setInputValue(title);
     }
     
     const updateTask = (id) => {
-        let updatedTask = inputValue;
 
-        let updatedEntry = displayList2.map(task => {
-          if(task.id === updateId){
-            return ({id:task.id, title:updatedTask, status : true})
+      let updatedTask = inputValue;
+        let updatedList = taskList.map(task => {
+          if(task.id === idRef.current){
+            return ({id:task.id, title:updatedTask, status : task.status})
           }
           return task
         });
         
-        setTogglebtn(true);
+        setIsEdited(true);
         setInputValue("");
-        setDisplayList2([...updatedEntry]);       
+        setTaskList([...updatedList]);       
     }
+  
       
     
-    const deleteValue = (id) => {
-        let deleteEntry = displayList2.filter(task => task.id !== id);
+    const deleteTask = (id) => {
+        let deleteList = taskList.filter(task => task.id !== id);
     
-        setDisplayList2([...deleteEntry]);
+        setTaskList([...deleteList]);
         setInputValue("");    
-        setTogglebtn(true);
+        setIsEdited(true);
         
     }
       
-    return (<React.Fragment>
+    return (<>
               <h1><center>TASK LIST</center></h1>
               <center>
-              <input className="pm" type="text" onChange={handleChange} value={inputValue}/>
-              {(togglebtn)?
+              <input className="pm" type="text" onChange={handleChange} value={inputValue} ref={inputRef}/>
+              {(isEdited)?
                   <>
                     <button className="pm" onClick={submitTask}>Add Task</button>
                     <button className="pm" onClick={resetTask}>Reset</button>
@@ -123,31 +104,34 @@ const Todo_with_hooks = () => {
                   </>
               }
               </center>
-        {(displayList1.length !==0)&& <h3>To Do List</h3>}
+        {(taskList.length !==0)&& <h3>To Do List</h3>}
         <ul>
-              {displayList1.map((task,index) => {
+              {taskList.filter(task => task.status === false).map((task) => {
                   return (<div key={task.id}>
-                  <li> {task.title} <input type="checkbox" onClick={(e)=>{chxCheck(task.id)}} value={task.title}></input></li>
-                  </div>);
-                  })}
-
-        </ul>
-        {(displayList2.length !==0)&&<h3>Completed Task</h3>}
-        <hr />
-        <ul>
-              {displayList2.map((task) => {
-                  return (<div key={task.id}>
-                  <li style={{textDecorationLine:"line-through"}}> {task.title}
-                    <input type="checkbox" onClick={(e)=>{chxCheck2(task.id)}} checked={true} onChange={handleChange2} value={task.title}></input> 
+                  <li> {task.title} <input type="checkbox" onClick={(e)=>{selectTask(task.id)}} value={task.title} />
                     <button className="pm" onClick={(e)=>{updateValue(task.id, task.title)}}>Update</button>
-                    <button className="pm" onClick={(e) => {deleteValue(task.id)}}>Delete</button>
+                    <button className="pm" onClick={(e) => {deleteTask(task.id)}}>Delete</button>
                   </li>
                   </div>);
                   })}
 
+        </ul>
+        <hr />
+        {(taskList.length !==0)&&  <h3>Completed Task</h3>}
+        
+        <ul>
+              {taskList.filter(task => task.status === true).map((task) => {
+                  return (<div key={task.id}>
+                  <li style={{textDecorationLine:"line-through"}}> {task.title}
+                    <input type="checkbox" onChange={(e)=>{selectTask(task.id)}} checked={task.status} value={task.title} /> 
+                    <button className="pm" onClick={(e) => {deleteTask(task.id)}}>Delete</button>
+                  </li>
+                  </div>)
+                  })}
+
                 </ul>
                 
-         </React.Fragment>);
+         </>);
 
 
               }
